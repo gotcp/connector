@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"connector"
+	"github.com/gotcp/connector"
 )
 
 type MongoSource struct {
@@ -27,7 +27,7 @@ func (self *MongoSource) Poll() ([][]byte, error) {
 }
 
 func (self *MongoSource) OnError(err error) {
-	fmt.Println("#OnError ", err)
+	fmt.Println("OnError ", err)
 }
 
 func main() {

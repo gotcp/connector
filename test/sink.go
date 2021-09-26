@@ -1,10 +1,9 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 
-	"connector"
+	"github.com/gotcp/connector"
 )
 
 type MongoSink struct {
@@ -27,11 +26,11 @@ func (self *MongoSink) Initialize() {
 
 func (self *MongoSink) Put(data []byte) error {
 	fmt.Println("Put - ", string(data))
-	return errors.New("test error")
+	return nil
 }
 
 func (c *MongoSink) OnError(err error) {
-	fmt.Println("#OnError - ", err)
+	fmt.Println("OnError - ", err)
 }
 
 func main() {
