@@ -15,18 +15,18 @@ var (
 	topic   = "test1"
 )
 
-func (self *MongoSource) Initialize() {
+func (me *MongoSource) Initialize() {
 	fmt.Println("Initialize")
-	self.SetBrokers(brokers)
-	self.SetTopic(topic)
+	me.SetBrokers(brokers)
+	me.SetTopic(topic)
 }
 
-func (self *MongoSource) Poll() ([][]byte, error) {
+func (me *MongoSource) Poll() ([][]byte, error) {
 	fmt.Println("Poll")
 	return nil, nil
 }
 
-func (self *MongoSource) OnError(err error) {
+func (me *MongoSource) OnError(err error) {
 	fmt.Println("OnError ", err)
 }
 

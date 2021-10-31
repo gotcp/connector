@@ -16,15 +16,15 @@ var (
 	group   = "1"
 )
 
-func (self *MongoSink) Initialize() {
+func (me *MongoSink) Initialize() {
 	fmt.Println("Initialize")
-	self.SetBrokers(brokers)
-	self.SetTopics(topics)
-	self.SetGroup(group)
+	me.SetBrokers(brokers)
+	me.SetTopics(topics)
+	me.SetGroup(group)
 	// c.SetCommitInterval()
 }
 
-func (self *MongoSink) Put(data []byte) error {
+func (me *MongoSink) Put(data []byte) error {
 	fmt.Println("Put - ", string(data))
 	return nil
 }

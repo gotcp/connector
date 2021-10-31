@@ -29,17 +29,17 @@ func newAsyncProducer(client sarama.Client) (producer sarama.AsyncProducer, err 
 	return
 }
 
-func (self *AsyncProducer) SetBrokers(brokers []string) {
-	self.brokers = brokers
+func (me *AsyncProducer) SetBrokers(brokers []string) {
+	me.brokers = brokers
 }
 
-func (self *AsyncProducer) SetTopic(topic string) {
-	self.topic = topic
+func (me *AsyncProducer) SetTopic(topic string) {
+	me.topic = topic
 }
 
-func (self *AsyncProducer) Initialize() (err error) {
+func (me *AsyncProducer) Initialize() (err error) {
 	var client sarama.Client
-	client, err = newAsyncProducerClient(self.brokers)
+	client, err = newAsyncProducerClient(me.brokers)
 	if err != nil {
 		return
 	}
@@ -53,24 +53,24 @@ func (self *AsyncProducer) Initialize() (err error) {
 		return
 	}
 
-	self.client = client
-	self.producer = producer
+	me.client = client
+	me.producer = producer
 
 	return
 }
 
-func (self *AsyncProducer) isAvailable() bool {
-	if self.client.Closed() || len(self.client.Brokers()) == 0 {
+func (me *AsyncProducer) isAvailable() bool {
+	if me.client.Closed() || len(me.client.Brokers()) == 0 {
 		return false
 	}
 	return true
 }
 
-func (self *AsyncProducer) renew() (err error) {
-	self.Close()
+func (me *AsyncProducer) renew() (err error) {
+	me.Close()
 
 	var client sarama.Client
-	client, err = newAsyncProducerClient(self.brokers)
+	client, err = newAsyncProducerClient(me.brokers)
 	if err != nil {
 		return
 	}
@@ -84,54 +84,54 @@ func (self *AsyncProducer) renew() (err error) {
 		return
 	}
 
-	self.client = client
-	self.producer = producer
+	me.client = client
+	me.producer = producer
 
 	return
 }
 
-func (self *AsyncProducer) renewIfNeed() (err error) {
-	if !self.isAvailable() {
-		err = self.renew()
+func (me *AsyncProducer) renewIfNeed() (err error) {
+	if !me.isAvailable() {
+		err = me.renew()
 	}
 	return
 }
 
-func (self *AsyncProducer) SendString(topic string, text string) (err error) {
-	if err = self.renewIfNeed(); err != nil {
+func (me *AsyncProducer) SendString(topic string, text string) (err error) {
+	if err = me.renewIfNeed(); err != nil {
 		return
 	}
-	self.producer.Input() <- &sarama.ProducerMessage{Topic: topic, Key: nil, Value: sarama.StringEncoder(text)}
+	me.producer.Input() <- &sarama.ProducerMessage{Topic: topic, Key: nil, Value: sarama.StringEncoder(text)}
 	select {
-	case err = <-self.producer.Errors():
+	case err = <-me.producer.Errors():
 		return
 	default:
 		return
 	}
 }
 
-func (self *AsyncProducer) SendBytes(topic string, text []byte) (err error) {
-	if err = self.renewIfNeed(); err != nil {
+func (me *AsyncProducer) SendBytes(topic string, text []byte) (err error) {
+	if err = me.renewIfNeed(); err != nil {
 		return
 	}
-	self.producer.Input() <- &sarama.ProducerMessage{Topic: topic, Key: nil, Value: sarama.ByteEncoder(text)}
+	me.producer.Input() <- &sarama.ProducerMessage{Topic: topic, Key: nil, Value: sarama.ByteEncoder(text)}
 	select {
-	case err = <-self.producer.Errors():
+	case err = <-me.producer.Errors():
 		return
 	default:
 		return
 	}
 }
 
-func (self *AsyncProducer) Close() {
-	if self.producer != nil {
-		self.producer.AsyncClose()
-		self.producer = nil
+func (me *AsyncProducer) Close() {
+	if me.producer != nil {
+		me.producer.AsyncClose()
+		me.producer = nil
 	}
-	if self.client != nil {
-		if self.client.Closed() == false {
-			self.client.Close()
-			self.client = nil
+	if me.client != nil {
+		if me.client.Closed() == false {
+			me.client.Close()
+			me.client = nil
 		}
 	}
 }

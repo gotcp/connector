@@ -12,24 +12,24 @@ type SourceSync struct {
 	kafkaProducer *SyncProducer
 }
 
-func (self *SourceSync) Start(child interface{}) {
+func (me *SourceSync) Start(child interface{}) {
 	if child == nil {
 		panic(_ERROR_CHILD_OBJECT_NULL)
 	}
-	self.child = child
+	me.child = child
 
-	self.Initialize()
-	CallFunc(self.child, _FUN_NAME_INITIALIZE)
+	me.Initialize()
+	CallFunc(me.child, _FUN_NAME_INITIALIZE)
 
-	self.process()
+	me.process()
 }
 
-func (self *SourceSync) Initialize() {
-	self.delay = _DEFAULT_DEALY
-	self.kafkaProducer = NewSyncProducer()
+func (me *SourceSync) Initialize() {
+	me.delay = _DEFAULT_DEALY
+	me.kafkaProducer = NewSyncProducer()
 }
 
-func (self *SourceSync) process() {
+func (me *SourceSync) process() {
 	var err error
 	var vals []reflect.Value
 
@@ -38,16 +38,16 @@ func (self *SourceSync) process() {
 	var i, count int
 
 	for {
-		if vals, err = CallFunc(self.child, _FUN_NAME_POLL); err != nil {
-			CallFunc(self.child, _FUN_NAME_ON_ERROR)
-			time.Sleep(self.delay)
+		if vals, err = CallFunc(me.child, _FUN_NAME_POLL); err != nil {
+			CallFunc(me.child, _FUN_NAME_ON_ERROR)
+			time.Sleep(me.delay)
 			continue
 		}
 
 		if v = vals[1].Interface(); v != nil {
 			if err = v.(error); err != nil {
-				CallFunc(self.child, _FUN_NAME_ON_ERROR, err)
-				time.Sleep(self.delay)
+				CallFunc(me.child, _FUN_NAME_ON_ERROR, err)
+				time.Sleep(me.delay)
 				continue
 			}
 		}
@@ -56,28 +56,28 @@ func (self *SourceSync) process() {
 			list = vals[0].Interface().([][]byte)
 			count = len(list)
 			for i = 0; i < count; i++ {
-				err = self.kafkaProducer.SendBytes(self.kafkaProducer.topic, list[i])
+				err = me.kafkaProducer.SendBytes(me.kafkaProducer.topic, list[i])
 				if err != nil {
-					CallFunc(self.child, _FUN_NAME_ON_ERROR, err)
+					CallFunc(me.child, _FUN_NAME_ON_ERROR, err)
 				}
 			}
 			if count == 0 {
-				time.Sleep(self.delay)
+				time.Sleep(me.delay)
 			}
 		} else {
-			time.Sleep(self.delay)
+			time.Sleep(me.delay)
 		}
 	}
 }
 
-func (self *SourceSync) SetBrokers(brokers []string) {
-	self.kafkaProducer.SetBrokers(brokers)
+func (me *SourceSync) SetBrokers(brokers []string) {
+	me.kafkaProducer.SetBrokers(brokers)
 }
 
-func (self *SourceSync) SetTopic(topic string) {
-	self.kafkaProducer.SetTopic(topic)
+func (me *SourceSync) SetTopic(topic string) {
+	me.kafkaProducer.SetTopic(topic)
 }
 
-func (self *SourceSync) SetDelay(t time.Duration) {
-	self.delay = t
+func (me *SourceSync) SetDelay(t time.Duration) {
+	me.delay = t
 }

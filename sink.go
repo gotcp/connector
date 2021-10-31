@@ -9,21 +9,21 @@ type Sink struct {
 	kafkaConsumer *KafkaConsumer
 }
 
-func (self *Sink) onError(err error) {
-	CallFunc(self.child, _FUN_NAME_ON_ERROR, err)
+func (me *Sink) onError(err error) {
+	CallFunc(me.child, _FUN_NAME_ON_ERROR, err)
 }
 
-func (self *Sink) onMessage(message []byte, offset int64, topic string, partition int32) bool {
-	var vs, err = CallFunc(self.child, _FUN_NAME_PUT, message)
+func (me *Sink) onMessage(message []byte, offset int64, topic string, partition int32) bool {
+	var vs, err = CallFunc(me.child, _FUN_NAME_PUT, message)
 	if err != nil {
-		CallFunc(self.child, _FUN_NAME_ON_ERROR, err)
+		CallFunc(me.child, _FUN_NAME_ON_ERROR, err)
 		return false
 	}
 
 	var v interface{}
 	if v = vs[0].Interface(); v != nil {
 		if err = v.(error); err != nil {
-			CallFunc(self.child, _FUN_NAME_ON_ERROR, err)
+			CallFunc(me.child, _FUN_NAME_ON_ERROR, err)
 			return false
 		}
 	}
@@ -31,40 +31,40 @@ func (self *Sink) onMessage(message []byte, offset int64, topic string, partitio
 	return true
 }
 
-func (self *Sink) Start(child interface{}) {
+func (me *Sink) Start(child interface{}) {
 	if child == nil {
 		panic(_ERROR_CHILD_OBJECT_NULL)
 	}
-	self.child = child
+	me.child = child
 
-	self.Initialize()
-	CallFunc(self.child, _FUN_NAME_INITIALIZE)
+	me.Initialize()
+	CallFunc(me.child, _FUN_NAME_INITIALIZE)
 
-	self.kafkaConsumer.Start()
+	me.kafkaConsumer.Start()
 }
 
-func (self *Sink) Initialize() {
-	self.kafkaConsumer = NewKafkaConsumer()
-	self.kafkaConsumer.OnMessage = self.onMessage
-	self.kafkaConsumer.OnError = self.onError
+func (me *Sink) Initialize() {
+	me.kafkaConsumer = NewKafkaConsumer()
+	me.kafkaConsumer.OnMessage = me.onMessage
+	me.kafkaConsumer.OnError = me.onError
 }
 
-func (self *Sink) SetBrokers(brokers []string) {
-	self.kafkaConsumer.SetBrokers(brokers)
+func (me *Sink) SetBrokers(brokers []string) {
+	me.kafkaConsumer.SetBrokers(brokers)
 }
 
-func (self *Sink) SetGroup(group string) {
-	self.kafkaConsumer.SetGroup(group)
+func (me *Sink) SetGroup(group string) {
+	me.kafkaConsumer.SetGroup(group)
 }
 
-func (self *Sink) SetTopics(topics []string) {
-	self.kafkaConsumer.SetTopics(topics)
+func (me *Sink) SetTopics(topics []string) {
+	me.kafkaConsumer.SetTopics(topics)
 }
 
-func (self *Sink) SetCommitInterval(t time.Duration) {
-	self.kafkaConsumer.SetCommitInterval(t)
+func (me *Sink) SetCommitInterval(t time.Duration) {
+	me.kafkaConsumer.SetCommitInterval(t)
 }
 
-func (self *Sink) SetOffsetType(offsetType OffsetType) {
-	self.kafkaConsumer.SetOffsetType(offsetType)
+func (me *Sink) SetOffsetType(offsetType OffsetType) {
+	me.kafkaConsumer.SetOffsetType(offsetType)
 }

@@ -39,19 +39,19 @@ func NewKafkaConsumer() *KafkaConsumer {
 	}
 }
 
-func (self *KafkaConsumer) Start() {
+func (me *KafkaConsumer) Start() {
 	var err error
 
 	var config = cluster.NewConfig()
 	config.Consumer.Return.Errors = true
-	config.Consumer.Offsets.CommitInterval = self.commitInterval
-	config.Consumer.Offsets.Initial = self.offsetType
+	config.Consumer.Offsets.CommitInterval = me.commitInterval
+	config.Consumer.Offsets.Initial = me.offsetType
 
 	var consumer *cluster.Consumer
 	consumer, err = cluster.NewConsumer(
-		self.brokers,
-		self.group,
-		self.topics,
+		me.brokers,
+		me.group,
+		me.topics,
 		config,
 	)
 	if err != nil {
@@ -65,7 +65,7 @@ func (self *KafkaConsumer) Start() {
 	go func() {
 		select {
 		case err = <-consumer.Errors():
-			self.OnError(err)
+			me.OnError(err)
 		}
 	}()
 
@@ -74,7 +74,7 @@ func (self *KafkaConsumer) Start() {
 	for {
 		select {
 		case message = <-consumer.Messages():
-			if self.OnMessage(message.Value, message.Offset, message.Topic, message.Partition) {
+			if me.OnMessage(message.Value, message.Offset, message.Topic, message.Partition) {
 				consumer.MarkOffset(message, _EMPTY_STRING)
 			}
 		case <-signals:
@@ -83,26 +83,26 @@ func (self *KafkaConsumer) Start() {
 	}
 }
 
-func (self *KafkaConsumer) SetBrokers(brokers []string) {
-	self.brokers = brokers
+func (me *KafkaConsumer) SetBrokers(brokers []string) {
+	me.brokers = brokers
 }
 
-func (self *KafkaConsumer) SetGroup(group string) {
-	self.group = group
+func (me *KafkaConsumer) SetGroup(group string) {
+	me.group = group
 }
 
-func (self *KafkaConsumer) SetTopics(topics []string) {
-	self.topics = topics
+func (me *KafkaConsumer) SetTopics(topics []string) {
+	me.topics = topics
 }
 
-func (self *KafkaConsumer) SetCommitInterval(t time.Duration) {
-	self.commitInterval = t
+func (me *KafkaConsumer) SetCommitInterval(t time.Duration) {
+	me.commitInterval = t
 }
 
-func (self *KafkaConsumer) SetOffsetType(offsetType OffsetType) {
+func (me *KafkaConsumer) SetOffsetType(offsetType OffsetType) {
 	if offsetType == OffsetOldest {
-		self.offsetType = sarama.OffsetOldest
+		me.offsetType = sarama.OffsetOldest
 	} else {
-		self.offsetType = sarama.OffsetNewest
+		me.offsetType = sarama.OffsetNewest
 	}
 }
